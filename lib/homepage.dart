@@ -23,8 +23,8 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.person),
             onPressed: () {
-              // TODO: Add navigation to user profile page
-              // For simplicity, we'll just print a message for now.
+              Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => EditProfilePage()));
               print('Open user profile');
             },
           ),
