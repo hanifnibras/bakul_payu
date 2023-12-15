@@ -1,37 +1,33 @@
 import 'package:flutter/material.dart';
-import 'edit_profile.dart'; 
-void main() {
-  runApp(MyApp());
+import 'edit_profile.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
 }
 
-class MyApp extends StatelessWidget {
-  @override
+class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+        child: Scaffold(
       appBar: AppBar(
         title: Text('E-Commerce App'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: Icon(Icons.person),
             onPressed: () {
               Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => EditProfilePage()));
+                  MaterialPageRoute(builder: (context) => EditProfilePage()));
               print('Open user profile');
             },
           ),
         ],
       ),
       body: ProductList(),
-    );
+    ));
   }
 }
 
