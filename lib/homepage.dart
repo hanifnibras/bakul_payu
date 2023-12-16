@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'edit_profile.dart'; 
+import 'edit_profile.dart';
+import 'seller_side.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -13,46 +15,128 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<String> products = ['Product 1', 'Product 2', 'Product 3'];
+  List<String> filteredProducts = [];
+  TextEditingController searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('E-Commerce App'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.person),
-            onPressed: () {
-              Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => EditProfilePage()));
-              print('Open user profile');
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'editProfile') {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => EditProfilePage()),
+                );
+              } else if (value == 'switchToSeller') {
+                // TODO: Add logic to navigate to the SellerPage
+                print('Switching to Seller side');
+              }
             },
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem<String>(
+                value: 'editProfile',
+                child: Text('Edit Profile'),
+              ),
+              PopupMenuItem<String>(
+                value: 'switchToSeller',
+                child: Text('Switch to Seller Side'),
+              ),
+            ],
           ),
         ],
       ),
-      body: ProductList(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                filterProducts(value);
+              },
+              decoration: InputDecoration(
+                labelText: 'Search Products',
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              CategoryButton(imagePath: 'assets/category1.png', category: 'Category 1'),
+              CategoryButton(imagePath: 'assets/category2.png', category: 'Category 2'),
+              CategoryButton(imagePath: 'assets/category3.png', category: 'Category 3'),
+              CategoryButton(imagePath: 'assets/category4.png', category: 'Category 4'),
+            ],
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredProducts.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(filteredProducts[index]),
+                  onTap: () {
+                    print('Open product details for ${filteredProducts[index]}');
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  void filterProducts(String query) {
+    setState(() {
+      filteredProducts = products
+          .where((product) => product.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 }
 
-class ProductList extends StatelessWidget {
+class CategoryButton extends StatelessWidget {
+  final String imagePath;
+  final String category;
+
+  CategoryButton({required this.imagePath, required this.category});
+
   @override
   Widget build(BuildContext context) {
-    // TODO: Replace this with your actual product list
-    List<String> products = ['Product 1', 'Product 2', 'Product 3'];
-
-    return ListView.builder(
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(products[index]),
-          // TODO: Add navigation to product details page
-          onTap: () {
-            // For simplicity, we'll just print a message.
-            print('Open product details for ${products[index]}');
-          },
-        );
+    return GestureDetector(
+      onTap: () {
+        // TODO: Add logic to filter products based on category
+        print('Selected category: $category');
       },
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage(imagePath),
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(category),
+        ],
+      ),
     );
   }
 }
