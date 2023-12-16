@@ -37,15 +37,16 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => EditProfilePage()),
                 );
-                // Navigate to the SellerPage
+              } else if (value == 'switchToSeller') {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                      builder: (context) => SellerSidePage(
-                            shopItems: [
-                              Item(name: 'Item 1', price: 10.0),
-                            ],
-                            orderHistory: [],
-                          )),
+                    builder: (context) => SellerSidePage(
+                      shopItems: [
+                        Item(name: 'Item 1', price: 10.0),
+                      ],
+                      orderHistory: [],
+                    ),
+                  ),
                 );
               }
             },
@@ -82,13 +83,21 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               CategoryButton(
-                  imagePath: 'assets/category1.png', category: 'Category 1'),
+                imagePath: 'assets/category1.png',
+                category: 'Category 1',
+              ),
               CategoryButton(
-                  imagePath: 'assets/category2.png', category: 'Category 2'),
+                imagePath: 'assets/category2.png',
+                category: 'Category 2',
+              ),
               CategoryButton(
-                  imagePath: 'assets/category3.png', category: 'Category 3'),
+                imagePath: 'assets/category3.png',
+                category: 'Category 3',
+              ),
               CategoryButton(
-                  imagePath: 'assets/category4.png', category: 'Category 4'),
+                imagePath: 'assets/category4.png',
+                category: 'Category 4',
+              ),
             ],
           ),
           Expanded(
@@ -114,7 +123,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       filteredProducts = products
           .where(
-              (product) => product.toLowerCase().contains(query.toLowerCase()))
+            (product) =>
+                product.toLowerCase().contains(query.toLowerCase()),
+          )
           .toList();
     });
   }
@@ -124,7 +135,10 @@ class CategoryButton extends StatelessWidget {
   final String imagePath;
   final String category;
 
-  CategoryButton({required this.imagePath, required this.category});
+  CategoryButton({
+    required this.imagePath,
+    required this.category,
+  });
 
   @override
   Widget build(BuildContext context) {
