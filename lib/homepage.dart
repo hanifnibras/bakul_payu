@@ -6,13 +6,11 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: HomePage(),
-    );
-  }
+  State<HomePage> createState() => _HomePageState();
 }
 
 class HomePage extends StatefulWidget {
@@ -27,9 +25,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+        child: Scaffold(
       appBar: AppBar(
         title: Text('E-Commerce App'),
+        automaticallyImplyLeading: false,
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -140,3 +140,4 @@ class CategoryButton extends StatelessWidget {
     );
   }
 }
+

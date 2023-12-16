@@ -1,11 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
-  runApp(MyApp());
+class EditProfilePage extends StatefulWidget {
+  const EditProfilePage({Key? key}) : super(key: key);
+
+  @override
+  State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class MyApp extends StatelessWidget {
+FirebaseFirestore _firestore = FirebaseFirestore.instance;
+FirebaseAuth auth = FirebaseAuth.instance;
+User? user = auth.currentUser;
+
+class _EditProfilePageState extends State<EditProfilePage> {
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _mobilephoneController = TextEditingController();
+
+  String _existingemail = "Default Name";
+  String _existingmobilephone = "Default Number";
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,6 +40,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
