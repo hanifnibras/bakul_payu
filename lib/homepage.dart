@@ -37,9 +37,15 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => EditProfilePage()),
                 );
-               // Navigate to the SellerPage
+                // Navigate to the SellerPage
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => SellerSidePage()),
+                  MaterialPageRoute(
+                      builder: (context) => SellerSidePage(
+                            shopItems: [
+                              Item(name: 'Item 1', price: 10.0),
+                            ],
+                            orderHistory: [],
+                          )),
                 );
               }
             },
@@ -75,10 +81,14 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              CategoryButton(imagePath: 'assets/category1.png', category: 'Category 1'),
-              CategoryButton(imagePath: 'assets/category2.png', category: 'Category 2'),
-              CategoryButton(imagePath: 'assets/category3.png', category: 'Category 3'),
-              CategoryButton(imagePath: 'assets/category4.png', category: 'Category 4'),
+              CategoryButton(
+                  imagePath: 'assets/category1.png', category: 'Category 1'),
+              CategoryButton(
+                  imagePath: 'assets/category2.png', category: 'Category 2'),
+              CategoryButton(
+                  imagePath: 'assets/category3.png', category: 'Category 3'),
+              CategoryButton(
+                  imagePath: 'assets/category4.png', category: 'Category 4'),
             ],
           ),
           Expanded(
@@ -88,7 +98,8 @@ class _HomePageState extends State<HomePage> {
                 return ListTile(
                   title: Text(filteredProducts[index]),
                   onTap: () {
-                    print('Open product details for ${filteredProducts[index]}');
+                    print(
+                        'Open product details for ${filteredProducts[index]}');
                   },
                 );
               },
@@ -102,7 +113,8 @@ class _HomePageState extends State<HomePage> {
   void filterProducts(String query) {
     setState(() {
       filteredProducts = products
-          .where((product) => product.toLowerCase().contains(query.toLowerCase()))
+          .where(
+              (product) => product.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
