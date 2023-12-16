@@ -1,45 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class Item {
-  String name;
-  double price;
-
-  Item({required this.name, required this.price});
-}
-
-class Order {
-  List<Item> items;
-  DateTime dateTime;
-
-  Order({required this.items, required this.dateTime});
-}
-
 class MyApp extends StatelessWidget {
-  final List<Item> shopItems = [
-    Item(name: 'Item 1', price: 10.0),
-    Item(name: 'Item 2', price: 20.0),
-    Item(name: 'Item 3', price: 15.0),
-  ];
-
-  List<Order> orderHistory = [];
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: SellerSidePage(
-        shopItems: shopItems,
-        orderHistory: orderHistory,
+        shopItems: [], // Add the appropriate initial value for shopItems
+        orderHistory: [],
       ),
     );
   }
 }
 
 class SellerSidePage extends StatefulWidget {
-  final List<Item> shopItems;
+  final List<Item> shopItems; // Resolved: Added this line to define the named parameter
   final List<Order> orderHistory;
 
   SellerSidePage({required this.shopItems, required this.orderHistory});
@@ -49,50 +28,16 @@ class SellerSidePage extends StatefulWidget {
 }
 
 class _SellerSidePageState extends State<SellerSidePage> {
-  List<Item> cart = [];
-
-  void addToCart(Item item) {
-    setState(() {
-      cart.add(item);
-    });
-  }
-
-  void placeOrder() {
-    if (cart.isNotEmpty) {
-      Order newOrder = Order(items: List.from(cart), dateTime: DateTime.now());
-      widget.orderHistory.add(newOrder);
-
-      // Clear the cart after placing the order
-      setState(() {
-        cart.clear();
-      });
-
-      // Optionally, you can show a confirmation dialog or navigate to order history.
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Order Placed'),
-            content: Text('Your order has been placed successfully!'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
+  ListingManager listingManager = ListingManager();
+  OrderManager orderManager = OrderManager();
+  OrderHistoryManager orderHistoryManager = OrderHistoryManager();
+  ShopSettingsManager shopSettingsManager = ShopSettingsManager();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shop Management'),
+        title: Text('Bakul Payu'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,56 +45,160 @@ class _SellerSidePageState extends State<SellerSidePage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Shop Items',
+              'Atur Penjualan',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: widget.shopItems.length,
+              itemCount: listingManager.listings.length,
               itemBuilder: (context, index) {
-                Item item = widget.shopItems[index];
+                String item = listingManager.listings[index];
                 return ListTile(
-                  title: Text(item.name),
-                  subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
-                  trailing: ElevatedButton(
+                  title: Text(item),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
                     onPressed: () {
-                      addToCart(item);
+                      listingManager.removeItem(item);
                     },
-                    child: Text('Add to Cart'),
                   ),
                 );
               },
             ),
           ),
-          Divider(),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Cart',
+              'Riwayat Penjualan',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              orderManager.placeOrder();
+              orderHistoryManager.addToOrderHistory(orderManager.currentOrder);
+              orderManager.clearCart();
+            },
+            child: Text('Lihat Riwayat Penjualan'),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Riwayat Penjualan',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: cart.length,
+              itemCount: orderHistoryManager.orderHistory.length,
               itemBuilder: (context, index) {
-                Item item = cart[index];
+                Order order = orderHistoryManager.orderHistory[index];
                 return ListTile(
-                  title: Text(item.name),
-                  subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
+                  title: Text('Order ${index + 1}'),
+                  subtitle: Text('Items: ${order.items.length} | Date: ${order.dateTime}'),
                 );
               },
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Pengaturan Toko',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              PickedFile? image = await shopSettingsManager.pickImage();
+              if (image != null) {
+                shopSettingsManager.uploadImage(image);
+              }
+            },
+            child: Text('Unggah Foto QR Rekening'),
+          ),
+          shopSettingsManager.paymentQRImage != null
+              ? Image.network(shopSettingsManager.paymentQRImage!)
+              : SizedBox.shrink(),
           ElevatedButton(
             onPressed: () {
-              placeOrder();
+              shopSettingsManager.editShopInformation();
             },
-            child: Text('Place Order'),
+            child: Text('Atur Informasi Tentang Toko'),
           ),
         ],
       ),
     );
   }
+}
+
+class ListingManager {
+  List<String> listings = [];
+
+  void addItem(String item) {
+    listings.add(item);
+  }
+
+  void removeItem(String item) {
+    listings.remove(item);
+  }
+}
+
+class OrderManager {
+  List<String> cart = [];
+  Order currentOrder = Order();
+
+  void addToCart(String item) {
+    cart.add(item);
+  }
+
+  void placeOrder() {
+    currentOrder.items = List.from(cart);
+    currentOrder.dateTime = DateTime.now();
+  }
+
+  void clearCart() {
+    cart.clear();
+  }
+}
+
+class OrderHistoryManager {
+  List<Order> orderHistory = [];
+
+  void addToOrderHistory(Order order) {
+    orderHistory.add(order);
+  }
+}
+
+class Order {
+  List<String> items = [];
+  DateTime dateTime;
+
+  Order() : dateTime = DateTime.now();
+}
+
+class ShopSettingsManager {
+  String? paymentQRImage;
+
+  Future<PickedFile?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    return await _picker.getImage(source: ImageSource.gallery);
+  }
+
+  void uploadImage(PickedFile image) {
+    // TODO: Implement image upload logic
+    // For now, store the image URL
+    paymentQRImage = 'https://example.com/path/to/uploaded/image.jpg';
+  }
+
+  void editShopInformation() {
+    // TODO: Add logic to edit shop information
+    print('Editing shop information.');
+  }
+}
+
+class Item {
+  final String name;
+  final double price;
+
+  Item({required this.name, required this.price});
 }

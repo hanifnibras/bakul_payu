@@ -3,6 +3,7 @@ import 'create_account.dart';
 import 'login.dart';
 import 'forget_password.dart';
 import 'homepage.dart';
+import 'seller_side.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 void main() async {
