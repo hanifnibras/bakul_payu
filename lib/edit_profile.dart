@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -9,38 +9,41 @@ class EditProfilePage extends StatefulWidget {
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-FirebaseFirestore _firestore = FirebaseFirestore.instance;
-FirebaseAuth auth = FirebaseAuth.instance;
-User? user = auth.currentUser;
-
 class _EditProfilePageState extends State<EditProfilePage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _mobilephoneController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
-  String _existingemail = "Default Name";
-  String _existingmobilephone = "Default Number";
+  late String _existingName;
+  late String _existingEmail;
+  late String _existingPhone;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: EditProfilePage(),
-    );
+  void initState() {
+    super.initState();
+    // Fetch existing user data from Firestore
+    _fetchUserData();
   }
-}
 
-class EditProfilePage extends StatefulWidget {
-  @override
-  _EditProfilePageState createState() => _EditProfilePageState();
-}
+  Future<void> _fetchUserData() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-class _EditProfilePageState extends State<EditProfilePage> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
+      final userData = snapshot.data();
+      if (userData != null) {
+        setState(() {
+          _existingName = userData['name'] ?? 'Default Name';
+          _existingEmail = userData['email'] ?? 'Default Email';
+          _existingPhone = userData['phone'] ?? 'Default Phone';
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
