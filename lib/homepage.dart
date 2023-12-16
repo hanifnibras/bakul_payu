@@ -84,19 +84,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               CategoryButton(
                 imagePath: 'assets/category1.png',
-                category: 'Category 1',
+                category: 'Pakaian',
               ),
               CategoryButton(
-                imagePath: 'assets/category2.png',
-                category: 'Category 2',
+                imagePath: 'assets/kerajinantangan.png',
+                category: 'Kerajinan Tangan',
               ),
               CategoryButton(
-                imagePath: 'assets/category3.png',
-                category: 'Category 3',
+                imagePath: 'assets/sembako.png',
+                category: 'Sembako',
               ),
               CategoryButton(
-                imagePath: 'assets/category4.png',
-                category: 'Category 4',
+                imagePath: 'oleholeh.png',
+                category: 'Jajanan',
               ),
             ],
           ),
