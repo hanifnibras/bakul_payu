@@ -37,9 +37,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => EditProfilePage()),
                 );
-              } else if (value == 'switchToSeller') {
-                // TODO: Add logic to navigate to the SellerPage
-                print('Switching to Seller side');
+               // Navigate to the SellerPage
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SellerSidePage()),
+                );
               }
             },
             itemBuilder: (BuildContext context) => [

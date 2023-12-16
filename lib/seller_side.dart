@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyHomePage(
+      home: SellerSidePage(
         shopItems: shopItems,
         orderHistory: orderHistory,
       ),
@@ -38,17 +38,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class SellerSidePage extends StatefulWidget {
   final List<Item> shopItems;
   final List<Order> orderHistory;
 
-  MyHomePage({required this.shopItems, required this.orderHistory});
+  SellerSidePage({required this.shopItems, required this.orderHistory});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _SellerSidePageState createState() => _SellerSidePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _SellerSidePageState extends State<SellerSidePage> {
   List<Item> cart = [];
 
   void addToCart(Item item) {
