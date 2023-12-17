@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'edit_profile.dart';
-import 'seller_side.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,6 +46,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 );
+              } else if (value == 'logout') {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => LoginPage()), // Replace LoginPage with your actual login page
+                );
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -58,6 +60,10 @@ class _HomePageState extends State<HomePage> {
               PopupMenuItem<String>(
                 value: 'switchToSeller',
                 child: Text('Switch to Seller Side'),
+              ),
+              PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Logout'),
               ),
             ],
           ),
@@ -163,6 +169,66 @@ class CategoryButton extends StatelessWidget {
           SizedBox(height: 8),
           Text(category),
         ],
+      ),
+    );
+  }
+}
+
+class EditProfilePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit Profile'),
+      ),
+      body: Center(
+        child: Text('Edit Profile Page'),
+      ),
+    );
+  }
+}
+
+class SellerSidePage extends StatelessWidget {
+  final List<Item> shopItems;
+  final List<dynamic> orderHistory;
+
+  SellerSidePage({
+    required this.shopItems,
+    required this.orderHistory,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Seller Side'),
+      ),
+      body: Center(
+        child: Text('Seller Side Page'),
+      ),
+    );
+  }
+}
+
+class Item {
+  final String name;
+  final double price;
+
+  Item({
+    required this.name,
+    required this.price,
+  });
+}
+
+class LoginPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
+      body: Center(
+        child: Text('Login Page'),
       ),
     );
   }
