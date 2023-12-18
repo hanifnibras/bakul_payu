@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:bakul_payu/edit_profile.dart';
+import 'package:bakul_payu/seller_side.dart';
+import 'package:bakul_payu/login.dart';
 
 void main() {
   runApp(MyApp());
@@ -47,8 +50,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               } else if (value == 'logout') {
+                // Redirect to login screen
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => LoginPage()), // Replace LoginPage with your actual login page
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               }
             },
@@ -89,7 +93,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               CategoryButton(
-                imagePath: 'assets/category1.png',
+                imagePath: 'assets/pakaian.png',
                 category: 'Pakaian',
               ),
               CategoryButton(
@@ -101,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                 category: 'Sembako',
               ),
               CategoryButton(
-                imagePath: 'oleholeh.png',
+                imagePath: 'assets/oleholeh.png',
                 category: 'Jajanan',
               ),
             ],
@@ -169,66 +173,6 @@ class CategoryButton extends StatelessWidget {
           SizedBox(height: 8),
           Text(category),
         ],
-      ),
-    );
-  }
-}
-
-class EditProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Profile'),
-      ),
-      body: Center(
-        child: Text('Edit Profile Page'),
-      ),
-    );
-  }
-}
-
-class SellerSidePage extends StatelessWidget {
-  final List<Item> shopItems;
-  final List<dynamic> orderHistory;
-
-  SellerSidePage({
-    required this.shopItems,
-    required this.orderHistory,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Seller Side'),
-      ),
-      body: Center(
-        child: Text('Seller Side Page'),
-      ),
-    );
-  }
-}
-
-class Item {
-  final String name;
-  final double price;
-
-  Item({
-    required this.name,
-    required this.price,
-  });
-}
-
-class LoginPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Center(
-        child: Text('Login Page'),
       ),
     );
   }
