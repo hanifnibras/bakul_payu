@@ -1,27 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SellerSidePage(
-        shopItems: [], // Add the appropriate initial value for shopItems
-        orderHistory: [],
-      ),
-    );
-  }
-}
-
 class SellerSidePage extends StatefulWidget {
-  final List<Item> shopItems; // Resolved: Added this line to define the named parameter
-  final List<Order> orderHistory;
-
-  SellerSidePage({required this.shopItems, required this.orderHistory});
+  const SellerSidePage({super.key});
 
   @override
   _SellerSidePageState createState() => _SellerSidePageState();
@@ -95,7 +76,8 @@ class _SellerSidePageState extends State<SellerSidePage> {
                 Order order = orderHistoryManager.orderHistory[index];
                 return ListTile(
                   title: Text('Order ${index + 1}'),
-                  subtitle: Text('Items: ${order.items.length} | Date: ${order.dateTime}'),
+                  subtitle: Text(
+                      'Items: ${order.items.length} | Date: ${order.dateTime}'),
                 );
               },
             ),

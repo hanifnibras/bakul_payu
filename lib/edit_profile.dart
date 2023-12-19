@@ -9,10 +9,13 @@ class EditProfilePage extends StatefulWidget {
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
+FirebaseFirestore _firestore = FirebaseFirestore.instance;
+final uid = FirebaseAuth.instance.currentUser?.uid;
+
 class _EditProfilePageState extends State<EditProfilePage> {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   late String _existingName;
   late String _existingEmail;
@@ -26,17 +29,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _fetchUserData() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       final DocumentSnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
-
       final userData = snapshot.data();
       if (userData != null) {
         setState(() {
           _existingName = userData['name'] ?? 'Default Name';
           _existingEmail = userData['email'] ?? 'Default Email';
-          _existingPhone = userData['phone'] ?? 'Default Phone';
+          _existingPhone = userData['mobilePhone'] ?? 'Default Phone';
+          nameController = TextEditingController(text: _existingName);
+          emailController = TextEditingController(text: _existingEmail);
+          phoneController = TextEditingController(text: _existingPhone);
         });
       }
     }
@@ -87,16 +91,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // TODO: Implement the logic to update user profile
-                String newName = nameController.text;
-                String newEmail = emailController.text;
-                String newPhone = phoneController.text;
-
-                // You can add your logic here to update the user's profile
-
-                // Print the updated details for now
-                print('Updated Profile: Name - $newName, Email - $newEmail, Phone - $newPhone');
+              onPressed: () async {
+                String newName = nameController.text.trim();
+                String newEmail = emailController.text.trim();
+                String newPhone = phoneController.text.trim();
+                try {
+                  await _firestore.collection("users").doc(uid).update({
+                    'name': newName,
+                    'email': newEmail,
+                    'mobilePhone': newPhone
+                  });
+                } catch (e) {
+                  if (e is FirebaseException) {
+                    print('Firebase error: ${e.message}');
+                  } else {
+                    print('Error: $e');
+                  }
+                }
               },
               child: Text('Simpan Pembaharuan'),
             ),

@@ -11,6 +11,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordconfirmationController =
       TextEditingController();
@@ -21,6 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void _registerAccount() async {
     try {
       String email = _emailController.text;
+      String name = _nameController.text;
       String password = _passwordController.text;
       String mobilePhone = _mobilephoneController.text;
 
@@ -42,6 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
           .collection('users')
           .doc(userCredential.user!.uid)
           .set({
+        'name': name,
         'email': email,
         'mobilePhone': mobilePhone,
       });
@@ -88,7 +91,8 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _haveAccount() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   void _forgotPassword() {
@@ -118,6 +122,14 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
                 border: OutlineInputBorder(),
               ),
             ),

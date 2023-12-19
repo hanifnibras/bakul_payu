@@ -49,9 +49,6 @@ flutter:
   uses-material-design: true
 
   assets:
-     - assets/pakaian.png
-     - assets/oleholeh.png
-     - assets/sembako.png
-     - assets/kerajinantangan.png
+     - assets/
 
   # ... (existing configurations)
