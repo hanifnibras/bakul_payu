@@ -50,46 +50,46 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Profile'),
+        title: const Text('Edit Profile'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Ganti Nama:',
               style: TextStyle(fontSize: 18),
             ),
             TextField(
               controller: nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Ketik Nama Baru.',
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Ganti Alamat Email:',
               style: TextStyle(fontSize: 18),
             ),
             TextField(
               controller: emailController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Ketik Alamat Email Baru',
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Ganti Nomor HP:',
               style: TextStyle(fontSize: 18),
             ),
             TextField(
               controller: phoneController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Ketik Nomor HP Baru',
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 String newName = nameController.text.trim();
@@ -109,7 +109,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                 }
               },
-              child: Text('Simpan Pembaharuan'),
+              child: const Text('Simpan Pembaharuan'),
             ),
           ],
         ),

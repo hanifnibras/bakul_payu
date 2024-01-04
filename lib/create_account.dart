@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -52,11 +54,11 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Pembuatan Akun Berhasil!'),
-            content: Text('Akun telah berhasil didaftarkan.'),
+            title: const Text('Pembuatan Akun Berhasil!'),
+            content: const Text('Akun telah berhasil didaftarkan.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => LoginPage()));
@@ -73,12 +75,12 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text(
+            title: const Text('Error'),
+            content: const Text(
                 'Proses pembuatan akun gagal, silahkan periksa kembali email dan kata sandi!!'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -103,79 +105,79 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bakul Payu'),
+        title: const Text('Bakul Payu'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Buat Akun',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Name',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Masukkan Kata sandi',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: _passwordconfirmationController,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Konfirmasi Kata Sandi',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: _mobilephoneController,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Masukkan Nomor HP',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _registerAccount,
-              child: Text('Daftar'),
+              child: const Text('Daftar'),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
                   onPressed: _haveAccount,
-                  child: Text('Punya Akun?'),
+                  child: const Text('Punya Akun?'),
                 ),
                 TextButton(
                   onPressed: _forgotPassword,
-                  child: Text('Lupa Kata Sandi?'),
+                  child: const Text('Lupa Kata Sandi?'),
                 ),
               ],
             ),

@@ -171,6 +171,7 @@ class _HomePageState extends State<HomePage> {
                             int productPrice = productDetails['product_price'];
                             String productTitle =
                                 productDetails['product_title'];
+                            String sellerId = productDetails['seller_id'];
                             String productPriceString = productPrice.toString();
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -179,11 +180,13 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                         builder: (context) => ProductDetailPage(
+                                              cartItems: const [],
                                               productCat: productCat,
                                               productDesc: productDesc,
                                               productImgUrl: productImgUrl,
                                               productPrice: productPrice,
                                               productTitle: productTitle,
+                                              sellerId: sellerId,
                                             )),
                                   );
                                 },
@@ -227,8 +230,8 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 Row(
                                                   children: [
-                                                    Text("Rp" +
-                                                        productPriceString)
+                                                    Text(
+                                                        "Rp$productPriceString")
                                                   ],
                                                 )
                                               ],
