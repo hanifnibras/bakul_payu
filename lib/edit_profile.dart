@@ -24,7 +24,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    // Fetch existing user data from Firestore
     _fetchUserData();
   }
 

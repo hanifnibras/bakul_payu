@@ -1,3 +1,4 @@
+import 'package:bakul_payu/seller_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                     } else if (value == 'switchToSeller') {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const SellerSidePage(),
+                          builder: (context) => const SellerPage(),
                         ),
                       );
                     } else if (value == 'logout') {

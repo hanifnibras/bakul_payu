@@ -93,7 +93,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   alignment: Alignment.centerLeft,
                   child: Image(
                     fit: BoxFit.contain,
-                    image: AssetImage('assets/bca-logo.png'),
+                    image: AssetImage('assets/bank-logo.png'),
                     height: 30,
                   ),
                 ),

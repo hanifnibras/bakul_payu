@@ -18,13 +18,13 @@ class _SellerSidePageState extends State<SellerSidePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bakul Payu'),
+        title: Text('Bakul Payu'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               'Atur Penjualan',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -38,7 +38,7 @@ class _SellerSidePageState extends State<SellerSidePage> {
                 return ListTile(
                   title: Text(item),
                   trailing: IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: Icon(Icons.delete),
                     onPressed: () {
                       listingManager.removeItem(item);
                     },
@@ -47,8 +47,8 @@ class _SellerSidePageState extends State<SellerSidePage> {
               },
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               'Riwayat Penjualan',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -60,10 +60,10 @@ class _SellerSidePageState extends State<SellerSidePage> {
               orderHistoryManager.addToOrderHistory(orderManager.currentOrder);
               orderManager.clearCart();
             },
-            child: const Text('Lihat Riwayat Penjualan'),
+            child: Text('Lihat Riwayat Penjualan'),
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               'Riwayat Penjualan',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -82,8 +82,8 @@ class _SellerSidePageState extends State<SellerSidePage> {
               },
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               'Pengaturan Toko',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -96,16 +96,16 @@ class _SellerSidePageState extends State<SellerSidePage> {
                 shopSettingsManager.uploadImage(image);
               }
             },
-            child: const Text('Unggah Foto QR Rekening'),
+            child: Text('Unggah Foto QR Rekening'),
           ),
           shopSettingsManager.paymentQRImage != null
               ? Image.network(shopSettingsManager.paymentQRImage!)
-              : const SizedBox.shrink(),
+              : SizedBox.shrink(),
           ElevatedButton(
             onPressed: () {
               shopSettingsManager.editShopInformation();
             },
-            child: const Text('Atur Informasi Tentang Toko'),
+            child: Text('Atur Informasi Tentang Toko'),
           ),
         ],
       ),
@@ -167,13 +167,10 @@ class ShopSettingsManager {
   }
 
   void uploadImage(PickedFile image) {
-    // TODO: Implement image upload logic
-    // For now, store the image URL
     paymentQRImage = 'https://example.com/path/to/uploaded/image.jpg';
   }
 
   void editShopInformation() {
-    // TODO: Add logic to edit shop information
     print('Editing shop information.');
   }
 }
