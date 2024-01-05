@@ -1,3 +1,4 @@
+import 'package:bakul_payu/seller_crud_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -107,36 +108,57 @@ class _SellerPageState extends State<SellerPage> {
         title: const Text('Bakul Payu'),
       ),
       body: SingleChildScrollView(
-        child: Column(children: [
-          const Text(
-            "Pengaturan Toko",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              String type = "qris";
-              _pickImage(ImageSource.gallery, type);
-            },
-            child: const Text('Unggah Foto QRIS'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              String type = "shopee";
-              _pickImage(ImageSource.gallery, type);
-            },
-            child: const Text('Unggah Foto ShopeePay'),
-          ),
-          const Text(
-            'Edit Informasi Bank:',
-            style: TextStyle(fontSize: 18),
-          ),
-          TextField(
-            controller: rekeningController,
-            decoration: const InputDecoration(
-              hintText: 'Ketik nomor rekening bank',
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text(
+              "Daftar Produk",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
-        ]),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) => const SellerCrudPage()),
+                );
+              },
+              child: const Text('Lihat Daftar Produk'),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Pengaturan Toko",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                String type = "qris";
+                _pickImage(ImageSource.gallery, type);
+              },
+              child: const Text('Unggah Barcode QRIS'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                String type = "shopee";
+                _pickImage(ImageSource.gallery, type);
+              },
+              child: const Text('Unggah Barcode ShopeePay'),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Edit Informasi Bank:',
+              style: TextStyle(fontSize: 18),
+            ),
+            TextField(
+              controller: rekeningController,
+              decoration: const InputDecoration(
+                hintText: 'Ketik nomor rekening bank',
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }
