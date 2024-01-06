@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    int currentPageIndex = 0;
     return WillPopScope(
         onWillPop: () async {
           // Show a confirmation dialog
@@ -29,8 +30,8 @@ class _HomePageState extends State<HomePage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Text('Confirm'),
-                content: const Text('Are you sure you want to exit?'),
+                title: const Text('Exit'),
+                content: const Text('Do you want to close the application?'),
                 actions: <Widget>[
                   ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(false),
@@ -47,24 +48,68 @@ class _HomePageState extends State<HomePage> {
           return shouldClose;
         },
         child: Scaffold(
+            bottomNavigationBar: NavigationBar(
+              onDestinationSelected: (int index) {
+                setState(() {
+                  currentPageIndex = index;
+                });
+                switch (index) {
+                  case 0:
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                    break;
+                  case 1:
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const SellerPage()),
+                    );
+                    break;
+                  case 2:
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const SellerPage()),
+                    );
+                    break;
+                  case 3:
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const EditProfilePage()),
+                    );
+                    break;
+                }
+              },
+              selectedIndex: currentPageIndex,
+              destinations: const <Widget>[
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.home),
+                  icon: Icon(Icons.home_outlined),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.receipt_long),
+                  icon: Icon(Icons.receipt_long_outlined),
+                  label: 'My Orders',
+                ),
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.business),
+                  icon: Icon(Icons.business_outlined),
+                  label: 'Seller Page',
+                ),
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.account_circle),
+                  icon: Icon(Icons.account_circle_outlined),
+                  label: 'Profile',
+                ),
+              ],
+            ),
             appBar: AppBar(
               title: const Text('Bakul Payu'),
               automaticallyImplyLeading: false,
               actions: [
                 PopupMenuButton<String>(
                   onSelected: (value) async {
-                    if (value == 'editProfile') {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const EditProfilePage()),
-                      );
-                    } else if (value == 'switchToSeller') {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const SellerPage(),
-                        ),
-                      );
-                    } else if (value == 'logout') {
+                    if (value == 'logout') {
                       final FirebaseAuth auth = FirebaseAuth.instance;
                       await auth.signOut();
                       Navigator.of(context).pushReplacement(
@@ -73,14 +118,6 @@ class _HomePageState extends State<HomePage> {
                     }
                   },
                   itemBuilder: (BuildContext context) => [
-                    const PopupMenuItem<String>(
-                      value: 'editProfile',
-                      child: Text('Edit Profile'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'switchToSeller',
-                      child: Text('Switch to Seller Side'),
-                    ),
                     const PopupMenuItem<String>(
                       value: 'logout',
                       child: Text('Logout'),

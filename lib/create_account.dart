@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bakul_payu/forget_password.dart';
 import 'package:bakul_payu/login.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordconfirmationController =
       TextEditingController();
   final TextEditingController _mobilephoneController = TextEditingController();
-
+  final TextEditingController _addressController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void _registerAccount() async {
@@ -27,15 +29,28 @@ class _RegisterPageState extends State<RegisterPage> {
       String name = _nameController.text;
       String password = _passwordController.text;
       String mobilePhone = _mobilephoneController.text;
-
-      // Validate password confirmation
+      String address = _addressController.text;
       if (_passwordController.text != _passwordconfirmationController.text) {
-        // Passwords do not match
-        // Handle this according to your app's UX
-        print('Passwords do not match');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content:
+                  const Text('Mohon konfirmasikan kedua password telah sesuai'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
         return;
       }
-
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -49,6 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
         'name': name,
         'email': email,
         'mobilePhone': mobilePhone,
+        'address': address
       });
       showDialog(
         context: context,
@@ -68,16 +84,14 @@ class _RegisterPageState extends State<RegisterPage> {
           );
         },
       );
-      // Successfully logged in, navigate to the home page
     } catch (e) {
-      // Handle login error, e.g., show an error message
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
             content: const Text(
-                'Proses pembuatan akun gagal, silahkan periksa kembali email dan kata sandi!!'),
+                'Proses pembuatan akun gagal, silahkan periksa kembali email dan kata sandi!'),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),
@@ -97,93 +111,100 @@ class _RegisterPageState extends State<RegisterPage> {
         .push(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
-  void _forgotPassword() {
-    // ... (your existing _forgotPassword method code)
-  }
+  void _forgotPassword() {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bakul Payu'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Buat Akun',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Masukkan Kata sandi',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _passwordconfirmationController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Konfirmasi Kata Sandi',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _mobilephoneController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Masukkan Nomor HP',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _registerAccount,
-              child: const Text('Daftar'),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        appBar: AppBar(
+          title: const Text('Bakul Payu'),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: _haveAccount,
-                  child: const Text('Punya Akun?'),
+                const Text(
+                  'Buat Akun',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                TextButton(
-                  onPressed: _forgotPassword,
-                  child: const Text('Lupa Kata Sandi?'),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Masukkan Kata sandi',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _passwordconfirmationController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Konfirmasi Kata Sandi',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _mobilephoneController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Masukkan Nomor HP',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Alamat',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _registerAccount,
+                  child: const Text('Daftar'),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: _haveAccount,
+                      child: const Text('Punya Akun?'),
+                    ),
+                    TextButton(
+                      onPressed: _forgotPassword,
+                      child: const Text('Lupa Kata Sandi?'),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }

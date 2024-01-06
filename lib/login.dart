@@ -1,8 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bakul_payu/forget_password.dart';
 import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/create_account.dart'; // Assuming your RegisterPage file is named register.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -24,18 +27,15 @@ class _LoginPageState extends State<LoginPage> {
         email: username,
         password: password,
       );
-
-      // Successfully logged in, navigate to the home page
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => const HomePage()));
     } catch (e) {
-      // Handle login error, e.g., show an error message
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: const Text('Failed to sign in. Please try again.'),
+            content: const Text('Login gagal. Mohon coba lagi.'),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),
@@ -52,8 +52,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void _forgotPassword() {
     print('Forgot Password clicked');
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => ForgetPasswordPage()));
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const ForgetPasswordPage()));
   }
 
   void _createAccountPressed() {
@@ -65,60 +65,87 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bakul Payu'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Login',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Kata Sandi',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _loginPressed,
-              child: const Text('Masuk'),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: _forgotPassword,
-                  child: const Text('Lupa Kata Sandi??'),
-                ),
-                TextButton(
-                  onPressed: _createAccountPressed,
-                  child: const Text('Buat Akun'),
-                ),
-              ],
-            ),
-          ],
+        appBar: AppBar(
+          title: const Text('Bakul Payu'),
+          automaticallyImplyLeading: false,
         ),
-      ),
-    );
+        body: WillPopScope(
+          onWillPop: () async {
+            // Show a confirmation dialog
+            bool shouldClose = await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Exit'),
+                  content: const Text('Do you want to close the application?'),
+                  actions: <Widget>[
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('No'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => SystemNavigator.pop(),
+                      child: const Text('Yes'),
+                    ),
+                  ],
+                );
+              },
+            );
+            return shouldClose;
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Kata Sandi',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _loginPressed,
+                    child: const Text('Masuk'),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: _forgotPassword,
+                        child: const Text('Lupa Kata Sandi?'),
+                      ),
+                      TextButton(
+                        onPressed: _createAccountPressed,
+                        child: const Text('Buat Akun'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 }

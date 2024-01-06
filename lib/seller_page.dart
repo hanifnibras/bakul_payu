@@ -1,3 +1,5 @@
+import 'package:bakul_payu/edit_profile.dart';
+import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/seller_crud_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -80,7 +82,7 @@ class _SellerPageState extends State<SellerPage> {
     }
   }
 
-  Future<void> _pickImage(ImageSource source, String type) async {
+  Future<void> pickImage(ImageSource source, String type) async {
     final pickedImage = await ImagePicker().pickImage(source: source);
 
     if (pickedImage != null) {
@@ -103,7 +105,61 @@ class _SellerPageState extends State<SellerPage> {
 
   @override
   Widget build(BuildContext context) {
+    int currentPageIndex = 2;
     return Scaffold(
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+          switch (index) {
+            case 0:
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+              break;
+            case 1:
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SellerPage()),
+              );
+              break;
+            case 2:
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SellerPage()),
+              );
+              break;
+            case 3:
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => const EditProfilePage()),
+              );
+              break;
+          }
+        },
+        selectedIndex: currentPageIndex,
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.receipt_long),
+            icon: Icon(Icons.receipt_long_outlined),
+            label: 'My Orders',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.business),
+            icon: Icon(Icons.business_outlined),
+            label: 'Seller Page',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.account_circle),
+            icon: Icon(Icons.account_circle_outlined),
+            label: 'Profile',
+          ),
+        ],
+      ),
       appBar: AppBar(
         title: const Text('Bakul Payu'),
       ),
@@ -112,6 +168,13 @@ class _SellerPageState extends State<SellerPage> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text(
+              'Seller Page',
+              style: TextStyle(fontSize: 24),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             const Text(
               "Daftar Produk",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -125,6 +188,17 @@ class _SellerPageState extends State<SellerPage> {
               },
               child: const Text('Lihat Daftar Produk'),
             ),
+            const SizedBox(
+              height: 20,
+            ),
+            const Text(
+              "Order",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Lihat Daftar Pesanan'),
+            ),
             const SizedBox(height: 20),
             const Text(
               "Pengaturan Toko",
@@ -134,7 +208,7 @@ class _SellerPageState extends State<SellerPage> {
             ElevatedButton(
               onPressed: () {
                 String type = "qris";
-                _pickImage(ImageSource.gallery, type);
+                pickImage(ImageSource.gallery, type);
               },
               child: const Text('Unggah Barcode QRIS'),
             ),
@@ -142,7 +216,7 @@ class _SellerPageState extends State<SellerPage> {
             ElevatedButton(
               onPressed: () {
                 String type = "shopee";
-                _pickImage(ImageSource.gallery, type);
+                pickImage(ImageSource.gallery, type);
               },
               child: const Text('Unggah Barcode ShopeePay'),
             ),

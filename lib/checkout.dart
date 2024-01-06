@@ -1,5 +1,10 @@
+import 'dart:io';
 import 'package:bakul_payu/store_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'process_payment.dart';
 import 'package:bakul_payu/cart_item.dart';
 
@@ -20,10 +25,132 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  String imgDownloadUrl = "";
+
   @override
   void initState() {
     super.initState();
     print("Initial Cart Items: ${widget.cartItems}");
+  }
+
+  bool customerIsNotSeller() {
+    if (widget.sellerId == uid) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  Future<String> uploadImageToStorage(File imageFile, String imageName) async {
+    try {
+      String filePath = 'images/transaction/$imageName';
+      Reference storageReference = FirebaseStorage.instance.ref(filePath);
+      String contentType = 'image/${imageName.split('.').last}';
+      UploadTask uploadTask = storageReference.putFile(
+        imageFile,
+        SettableMetadata(contentType: contentType),
+      );
+      await uploadTask.whenComplete(() => null);
+      String imgDownloadUrl = await storageReference.getDownloadURL();
+      return imgDownloadUrl;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return '';
+    }
+  }
+
+  Future<void> uploadDataToDatabase(String imageURL) async {
+    try {
+      List<Map<String, dynamic>> cartItemsData = widget.cartItems
+          .map((cartItem) => {
+                'productImgUrl': cartItem.productImgUrl,
+                'productTitle': cartItem.productTitle,
+                'productPrice': cartItem.productPrice,
+                'quantity': cartItem.quantity,
+              })
+          .toList();
+      await FirebaseFirestore.instance.collection('transactions').doc().set({
+        'paymentImgUrl': imageURL,
+        'buyerId': uid,
+        'sellerId': widget.sellerId,
+        'totalPrice': calculateTotalPrice(),
+        'transactionStatus': "pending",
+        'cartItems': cartItemsData
+      });
+      print('Firestore updated with image URL');
+    } catch (e) {
+      print('Error updating Firestore: $e');
+    }
+  }
+
+  Future<void> pickImage(ImageSource source) async {
+    final pickedImage = await ImagePicker().pickImage(source: source);
+    if (pickedImage != null) {
+      String fileExtension = pickedImage.path.split('.').last;
+      String imageName =
+          "${DateTime.now().millisecondsSinceEpoch}.$fileExtension";
+      imgDownloadUrl = await uploadImageToStorage(
+        File(pickedImage.path),
+        imageName,
+      );
+      setState(() {});
+      _showImageDialog();
+    }
+  }
+
+  Future<void> deleteImageFromStorage(String imageUrl) async {
+    try {
+      Reference storageReference =
+          FirebaseStorage.instance.refFromURL(imageUrl);
+      await storageReference.delete();
+      print('Image deleted from storage');
+    } catch (e) {
+      print('Error deleting image: $e');
+    }
+  }
+
+  void _showImageDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Payment Proof'),
+              content: ClipRRect(
+                borderRadius: BorderRadius.circular(
+                    10.0), // Set the border radius as needed
+                child: Image.network(
+                  imgDownloadUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    deleteImageFromStorage(imgDownloadUrl);
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    uploadDataToDatabase(imgDownloadUrl);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ProcessPaymentPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   int calculateTotalPrice() {
@@ -122,11 +249,31 @@ class _CheckoutPageState extends State<CheckoutPage> {
               const SizedBox(height: 10),
               Center(
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const ProcessPaymentPage(),
-                    ),
-                  ),
+                  onPressed: () {
+                    bool customerCheck = customerIsNotSeller();
+                    if (customerCheck == true) {
+                      pickImage(ImageSource.gallery);
+                    } else if (customerCheck == false) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Invalid"),
+                            content:
+                                const Text("Seller cannot buy their own item."),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("Ok"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
                   child: const Text('Submit Payment'),
                 ),
               ),

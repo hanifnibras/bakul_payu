@@ -38,12 +38,13 @@ class _EditProductState extends State<EditProduct> {
   Future<String> uploadImageToStorage(File imageFile, String imageName) async {
     try {
       String filePath = 'images/product/$imageName';
-
       Reference storageReference = FirebaseStorage.instance.ref(filePath);
-
-      UploadTask uploadTask = storageReference.putFile(imageFile);
+      String contentType = 'image/${imageName.split('.').last}';
+      UploadTask uploadTask = storageReference.putFile(
+        imageFile,
+        SettableMetadata(contentType: contentType),
+      );
       await uploadTask.whenComplete(() => null);
-
       String downloadURL = await storageReference.getDownloadURL();
       return downloadURL;
     } catch (e) {
@@ -64,9 +65,8 @@ class _EditProductState extends State<EditProduct> {
     }
   }
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> pickImage(ImageSource source) async {
     final pickedImage = await ImagePicker().pickImage(source: source);
-
     if (pickedImage != null) {
       String fileExtension = pickedImage.path.split('.').last;
       String imageName =
@@ -157,7 +157,7 @@ class _EditProductState extends State<EditProduct> {
                         Center(
                           child: ElevatedButton(
                             onPressed: () {
-                              _pickImage(ImageSource.gallery);
+                              pickImage(ImageSource.gallery);
                             },
                             child: const Text('Change Image'),
                           ),

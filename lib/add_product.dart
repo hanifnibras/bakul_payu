@@ -36,7 +36,11 @@ class _AddProductState extends State<AddProduct> {
 
       Reference storageReference = FirebaseStorage.instance.ref(filePath);
 
-      UploadTask uploadTask = storageReference.putFile(imageFile);
+      String contentType = 'image/${imageName.split('.').last}';
+      UploadTask uploadTask = storageReference.putFile(
+        imageFile,
+        SettableMetadata(contentType: contentType),
+      );
       await uploadTask.whenComplete(() => null);
 
       String downloadURL = await storageReference.getDownloadURL();
@@ -47,7 +51,7 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
-  Future<String> _pickImage(ImageSource source) async {
+  Future<String> pickImage(ImageSource source) async {
     final pickedImage = await ImagePicker().pickImage(source: source);
 
     if (pickedImage != null) {
@@ -91,7 +95,7 @@ class _AddProductState extends State<AddProduct> {
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  String uploadedImgUrl = await _pickImage(ImageSource.gallery);
+                  String uploadedImgUrl = await pickImage(ImageSource.gallery);
                   setState(() {
                     imgUrl = uploadedImgUrl;
                   });
