@@ -26,11 +26,44 @@ class _SellerPageState extends State<SellerPage> {
   String _existingRekening = "";
   String qrisLink = "";
   String shopeeLink = "";
+  bool myOrderNotification = false;
+  bool sellerPageNotification = false;
 
   @override
   void initState() {
     super.initState();
     _fetchSellerData();
+    myOrderDotNotification();
+    sellerPageDotNotification();
+  }
+
+  Future<void> myOrderDotNotification() async {
+    if (uid != null) {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('transactions')
+              .where('buyerId', isEqualTo: uid)
+              .where('transactionStatus',
+                  whereIn: ["confirmed", "finished", "declined"]).get();
+      setState(() {
+        myOrderNotification = snapshot.docs.isNotEmpty;
+      });
+    }
+  }
+
+  Future<void> sellerPageDotNotification() async {
+    if (uid != null) {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore
+              .instance
+              .collection('transactions')
+              .where('sellerId', isEqualTo: uid)
+              .where('transactionStatus',
+                  whereIn: ["pending", "reviewed"]).get();
+      setState(() {
+        sellerPageNotification = snapshot.docs.isNotEmpty;
+      });
+    }
   }
 
   Future<void> _fetchSellerData() async {
@@ -145,23 +178,45 @@ class _SellerPageState extends State<SellerPage> {
           }
         },
         selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
+        destinations: <Widget>[
+          const NavigationDestination(
             selectedIcon: Icon(Icons.home),
             icon: Icon(Icons.home_outlined),
             label: 'Home',
           ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.receipt_long),
-            icon: Icon(Icons.receipt_long_outlined),
-            label: 'My Orders',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.business),
-            icon: Icon(Icons.business_outlined),
-            label: 'Seller Page',
-          ),
-          NavigationDestination(
+          if (myOrderNotification == true) ...[
+            const NavigationDestination(
+              selectedIcon: Icon(Icons.receipt_long),
+              icon: Badge(
+                label: Text('!'),
+                child: Icon(Icons.receipt_long_outlined),
+              ),
+              label: 'My Orders',
+            ),
+          ] else ...[
+            const NavigationDestination(
+              selectedIcon: Icon(Icons.receipt_long),
+              icon: Icon(Icons.receipt_long_outlined),
+              label: 'My Orders',
+            ),
+          ],
+          if (sellerPageNotification == true) ...[
+            const NavigationDestination(
+              selectedIcon: Icon(Icons.business),
+              icon: Badge(
+                label: Text('!'),
+                child: Icon(Icons.business_outlined),
+              ),
+              label: 'Seller Page',
+            ),
+          ] else ...[
+            const NavigationDestination(
+              selectedIcon: Icon(Icons.business),
+              icon: Icon(Icons.business_outlined),
+              label: 'Seller Page',
+            )
+          ],
+          const NavigationDestination(
             selectedIcon: Icon(Icons.account_circle),
             icon: Icon(Icons.account_circle_outlined),
             label: 'Profile',
