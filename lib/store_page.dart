@@ -72,7 +72,8 @@ class _StorePageState extends State<StorePage> {
                         5,
                         (index) => Icon(
                           Icons.star,
-                          color: index < rating ? Colors.yellow : Colors.grey,
+                          color:
+                              index < storeRating ? Colors.yellow : Colors.grey,
                         ),
                       ),
                     ),
