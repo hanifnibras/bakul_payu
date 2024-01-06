@@ -64,7 +64,12 @@ class _RegisterPageState extends State<RegisterPage> {
         'name': name,
         'email': email,
         'mobilePhone': mobilePhone,
-        'address': address
+        'address': address,
+        'qrisLink': '',
+        'shopeeLink': '',
+        'rekening': '',
+        'rating': 0,
+        'reviewCount': 0
       });
       showDialog(
         context: context,

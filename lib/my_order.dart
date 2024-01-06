@@ -15,6 +15,8 @@ class MyOrder extends StatefulWidget {
 
 class _MyOrderState extends State<MyOrder> {
   final uid = FirebaseAuth.instance.currentUser?.uid;
+  int selectedStars = 0;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<String> fetchSellerName(String sellerId) async {
     try {
@@ -37,9 +39,11 @@ class _MyOrderState extends State<MyOrder> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     Map<String, String> paymentStatusTextMap = {
+      'declined': 'Order is declined',
       'pending': 'Waiting payment confirmation',
       'confirmed': 'Order is processed',
       'finished': 'Order is finished',
+      'reviewed': 'Thank you for your review'
     };
     int currentPageIndex = 1;
 
@@ -148,14 +152,13 @@ class _MyOrderState extends State<MyOrder> {
                                     orderDetails['paymentImgUrl'];
                                 int totalPrice = orderDetails['totalPrice'];
                                 String sellerId = orderDetails['sellerId'];
+                                String transactionId = orders[index].id;
                                 String productPriceString =
                                     totalPrice.toString();
                                 String transactionStatus =
                                     orderDetails['transactionStatus'];
                                 final List<dynamic> cartItems =
                                     orderDetails['cartItems'] as List<dynamic>;
-                                Future<String> sellerName =
-                                    fetchSellerName(sellerId);
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -264,6 +267,102 @@ class _MyOrderState extends State<MyOrder> {
                                     const SizedBox(
                                       height: 10,
                                     ),
+                                    if (transactionStatus == 'finished') ...[
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return StatefulBuilder(
+                                                builder: (context, setState) {
+                                                  return AlertDialog(
+                                                    title: const Text(
+                                                        'Berikan Rating'),
+                                                    content: Row(
+                                                      children: [
+                                                        const Text(
+                                                            "Rate this product: "),
+                                                        ...List.generate(
+                                                          5,
+                                                          (index) =>
+                                                              GestureDetector(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                selectedStars =
+                                                                    index + 1;
+                                                              });
+                                                            },
+                                                            child: Icon(
+                                                              Icons.star,
+                                                              color: index <
+                                                                      selectedStars
+                                                                  ? Colors
+                                                                      .yellow
+                                                                  : Colors.grey,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        child: const Text(
+                                                            'Batalkan'),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                      TextButton(
+                                                        child: const Text('Ya'),
+                                                        onPressed: () async {
+                                                          try {
+                                                            await _firestore
+                                                                .collection(
+                                                                    "users")
+                                                                .doc(sellerId)
+                                                                .update({
+                                                              'rating': FieldValue
+                                                                  .increment(
+                                                                      selectedStars),
+                                                              'reviewCount':
+                                                                  FieldValue
+                                                                      .increment(
+                                                                          1),
+                                                            });
+                                                            await _firestore
+                                                                .collection(
+                                                                    "transactions")
+                                                                .doc(
+                                                                    transactionId)
+                                                                .update({
+                                                              'transactionStatus':
+                                                                  'reviewed',
+                                                            });
+                                                          } catch (e) {
+                                                            if (e
+                                                                is FirebaseException) {
+                                                              print(
+                                                                  'Firebase error: ${e.message}');
+                                                            } else {
+                                                              print(
+                                                                  'Error: $e');
+                                                            }
+                                                          }
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Text("Post Review"),
+                                      ),
+                                    ],
                                     const Divider(
                                       color: Color.fromRGBO(0, 0, 0, 1),
                                       thickness: 1,

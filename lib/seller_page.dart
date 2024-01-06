@@ -1,14 +1,14 @@
 import 'package:bakul_payu/edit_profile.dart';
 import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/seller_crud_page.dart';
+import 'package:bakul_payu/seller_order.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-
-import 'my_order.dart';
+import 'package:bakul_payu/my_order.dart';
 
 class SellerPage extends StatefulWidget {
   const SellerPage({super.key});
@@ -198,7 +198,11 @@ class _SellerPageState extends State<SellerPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const SellerOrder()),
+                );
+              },
               child: const Text('Lihat Daftar Pesanan'),
             ),
             const SizedBox(height: 20),

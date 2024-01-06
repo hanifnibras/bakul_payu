@@ -42,6 +42,52 @@ class _StorePageState extends State<StorePage> {
               "${widget.sellerName}'s Store",
               style: const TextStyle(fontSize: 20),
             )),
+            const SizedBox(
+              height: 10,
+            ),
+            StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(widget.sellerId)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                      sellerSnapshot) {
+                if (!sellerSnapshot.hasData || !sellerSnapshot.data!.exists) {
+                  return const Center(
+                    child: Text('Rating information not available'),
+                  );
+                }
+                final Map<String, dynamic> sellerData =
+                    sellerSnapshot.data!.data()!;
+                int rating = sellerData['rating'] ?? 0;
+                int reviewCount = sellerData['reviewCount'] ?? 0;
+                double storeRating = reviewCount > 0 ? rating / reviewCount : 0;
+                return Center(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: List.generate(
+                        5,
+                        (index) => Icon(
+                          Icons.star,
+                          color: index < rating ? Colors.yellow : Colors.grey,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text('(${storeRating.toStringAsFixed(2)})'),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text('($reviewCount reviews)'),
+                  ],
+                ));
+              },
+            ),
             StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('products')

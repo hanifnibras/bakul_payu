@@ -11,9 +11,8 @@ class SellerCrudPage extends StatefulWidget {
   State<SellerCrudPage> createState() => _SellerCrudPageState();
 }
 
-final uid = FirebaseAuth.instance.currentUser?.uid;
-
 class _SellerCrudPageState extends State<SellerCrudPage> {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
   String sellerName = "";
 
   @override
