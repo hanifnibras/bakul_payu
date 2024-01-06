@@ -14,14 +14,17 @@ class SellerCrudPage extends StatefulWidget {
 class _SellerCrudPageState extends State<SellerCrudPage> {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   String sellerName = "";
+  String qrisLink = "";
+  String shopeeLink = "";
+  String rekening = "";
 
   @override
   void initState() {
     super.initState();
-    fetchProfileName();
+    fetchSellerData();
   }
 
-  Future<void> fetchProfileName() async {
+  Future<void> fetchSellerData() async {
     try {
       final DocumentSnapshot<Map<String, dynamic>> userSnapshot =
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
@@ -29,6 +32,9 @@ class _SellerCrudPageState extends State<SellerCrudPage> {
       if (userSnapshot.exists) {
         setState(() {
           sellerName = userSnapshot.data()?['name'] ?? '';
+          qrisLink = userSnapshot.data()?['qrisLink'] ?? '';
+          shopeeLink = userSnapshot.data()?['shopeeLink'] ?? '';
+          rekening = userSnapshot.data()?['rekening'] ?? '';
         });
       }
     } catch (error) {
@@ -60,9 +66,29 @@ class _SellerCrudPageState extends State<SellerCrudPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const AddProduct()),
-                  );
+                  if (qrisLink.isNotEmpty ||
+                      shopeeLink.isNotEmpty ||
+                      rekening.isNotEmpty) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const AddProduct()),
+                    );
+                  } else {
+                    AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text(
+                          'Tolong berikan metode pembayaran untuk customer (QRIS, Shopee, atau rekening)'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  }
                 },
                 child: const Text('Tambah Produk Baru'),
               ),

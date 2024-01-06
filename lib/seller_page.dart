@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bakul_payu/edit_profile.dart';
 import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/seller_crud_page.dart';
@@ -17,11 +19,13 @@ class SellerPage extends StatefulWidget {
   State<SellerPage> createState() => _SellerPageState();
 }
 
-final uid = FirebaseAuth.instance.currentUser?.uid;
-
 class _SellerPageState extends State<SellerPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final uid = FirebaseAuth.instance.currentUser?.uid;
   TextEditingController rekeningController = TextEditingController();
-  late String _existingRekening;
+  String _existingRekening = "";
+  String qrisLink = "";
+  String shopeeLink = "";
 
   @override
   void initState() {
@@ -37,6 +41,8 @@ class _SellerPageState extends State<SellerPage> {
       if (userData != null) {
         setState(() {
           _existingRekening = userData['rekening'] ?? '';
+          qrisLink = userData['qrisLink'] ?? '';
+          shopeeLink = userData['shopeeLink'] ?? '';
           rekeningController = TextEditingController(text: _existingRekening);
         });
       }
@@ -211,6 +217,16 @@ class _SellerPageState extends State<SellerPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
+            if (qrisLink.isNotEmpty) ...[
+              Image.network(
+                qrisLink,
+                height: 300,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
             ElevatedButton(
               onPressed: () {
                 String type = "qris";
@@ -219,6 +235,16 @@ class _SellerPageState extends State<SellerPage> {
               child: const Text('Unggah Barcode QRIS'),
             ),
             const SizedBox(height: 10),
+            if (shopeeLink.isNotEmpty) ...[
+              Image.network(
+                height: 300,
+                shopeeLink,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
             ElevatedButton(
               onPressed: () {
                 String type = "shopee";
@@ -228,7 +254,7 @@ class _SellerPageState extends State<SellerPage> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Edit Informasi Bank:',
+              'Edit Informasi Rekening:',
               style: TextStyle(fontSize: 18),
             ),
             TextField(
@@ -236,6 +262,60 @@ class _SellerPageState extends State<SellerPage> {
               decoration: const InputDecoration(
                 hintText: 'Ketik nomor rekening bank',
               ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await _firestore.collection("users").doc(uid).update({
+                    'rekening': rekeningController.text.trim(),
+                  });
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Success'),
+                        content:
+                            const Text('Nomor rekening berhasil di update'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } catch (e) {
+                  if (e is FirebaseException) {
+                    print('Firebase error: ${e.message}');
+                  } else {
+                    print('Error: $e');
+                  }
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Error'),
+                        content: const Text('Nomor rekening gagal di update'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: const Text('Update Informasi Rekening'),
             ),
           ]),
         ),

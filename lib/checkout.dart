@@ -27,11 +27,34 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   String imgDownloadUrl = "";
+  String qrisLink = "";
+  String shopeeLink = "";
+  String rekening = "";
 
   @override
   void initState() {
     super.initState();
-    print("Initial Cart Items: ${widget.cartItems}");
+    fetchSellerData();
+  }
+
+  Future<void> fetchSellerData() async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(widget.sellerId)
+              .get();
+
+      if (userSnapshot.exists) {
+        setState(() {
+          qrisLink = userSnapshot.data()?['qrisLink'] ?? '';
+          shopeeLink = userSnapshot.data()?['shopeeLink'] ?? '';
+          rekening = userSnapshot.data()?['rekening'] ?? '';
+        });
+      }
+    } catch (error) {
+      print('Error fetching seller name: $error');
+    }
   }
 
   bool customerIsNotSeller() {
@@ -189,8 +212,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              const ExpansionTile(
-                title: Align(
+              ExpansionTile(
+                title: const Align(
                   alignment: Alignment.centerLeft,
                   child: Image(
                     fit: BoxFit.contain,
@@ -198,11 +221,19 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     height: 30,
                   ),
                 ),
-                children: <Widget>[Image(image: AssetImage('assets/qris.png'))],
+                children: <Widget>[
+                  if (qrisLink.isEmpty) ...[
+                    const Text("QRIS Tidak tersedia di seller ini"),
+                  ] else ...[
+                    Image.network(
+                      qrisLink,
+                    ),
+                  ],
+                ],
               ),
               const SizedBox(height: 10),
-              const ExpansionTile(
-                title: Align(
+              ExpansionTile(
+                title: const Align(
                   alignment: Alignment.centerLeft,
                   child: Image(
                     fit: BoxFit.contain,
@@ -211,12 +242,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
                 children: <Widget>[
-                  Image(image: AssetImage('assets/shopee-qr.jpg'))
+                  if (shopeeLink.isEmpty) ...[
+                    const Text("ShopeePay Tidak tersedia di seller ini"),
+                  ] else ...[
+                    Image.network(
+                      shopeeLink,
+                    ),
+                  ],
                 ],
               ),
               const SizedBox(height: 10),
-              const ExpansionTile(
-                title: Align(
+              ExpansionTile(
+                title: const Align(
                   alignment: Alignment.centerLeft,
                   child: Image(
                     fit: BoxFit.contain,
@@ -225,7 +262,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
                 children: <Widget>[
-                  Text("A/N: Bakul Payu, No. Rek: 1209417248819"),
+                  if (rekening.isEmpty) ...[
+                    const Text("Nomor Rekening Tidak tersedia di seller ini"),
+                  ] else ...[
+                    Text(rekening)
+                  ]
                 ],
               ),
               const SizedBox(height: 20),

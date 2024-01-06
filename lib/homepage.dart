@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bakul_payu/edit_profile.dart';
-import 'package:bakul_payu/seller_side.dart';
 import 'package:bakul_payu/login.dart';
 import 'package:flutter/services.dart';
 import 'product_detail.dart';
