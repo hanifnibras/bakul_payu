@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:bakul_payu/homepage.dart';
+import 'package:bakul_payu/my_order.dart';
 import 'package:bakul_payu/seller_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,7 +39,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 break;
               case 1:
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const SellerPage()),
+                  MaterialPageRoute(builder: (context) => const MyOrder()),
                 );
                 break;
               case 2:

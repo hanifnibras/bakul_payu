@@ -1,3 +1,4 @@
+import 'package:bakul_payu/my_order.dart';
 import 'package:bakul_payu/seller_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,10 +16,9 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-String selectedCategory = "allCat";
-
 class _HomePageState extends State<HomePage> {
   TextEditingController searchController = TextEditingController();
+  String selectedCategory = "allCat";
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +61,7 @@ class _HomePageState extends State<HomePage> {
                     break;
                   case 1:
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) => const SellerPage()),
+                      MaterialPageRoute(builder: (context) => const MyOrder()),
                     );
                     break;
                   case 2:

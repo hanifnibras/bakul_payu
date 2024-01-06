@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import 'my_order.dart';
+
 class SellerPage extends StatefulWidget {
   const SellerPage({super.key});
 
@@ -120,7 +122,7 @@ class _SellerPageState extends State<SellerPage> {
               break;
             case 1:
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const SellerPage()),
+                MaterialPageRoute(builder: (context) => const MyOrder()),
               );
               break;
             case 2:
