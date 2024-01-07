@@ -1,3 +1,5 @@
+import 'package:bakul_payu/admin_homepage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'create_account.dart';
@@ -17,34 +19,52 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final User? user;
-  const MyApp({super.key, this.user});
 
-  // This widget is the root of your application.
+  const MyApp({Key? key, this.user}) : super(key: key);
+
+  Future<String> getUserType() async {
+    if (user != null) {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+      if (userSnapshot.exists) {
+        String userType = userSnapshot.get('userType');
+        return userType;
+      }
+    }
+    return "";
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: user == null ? LoginPage() : const HomePage(),
+      home: FutureBuilder(
+        future: getUserType(),
+        builder: (context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text("Error: ${snapshot.error}");
+          } else {
+            String userType = snapshot.data ?? "";
+            if (userType == 'user') {
+              return const HomePage();
+            }
+            if (userType == 'admin') {
+              return const AdminHomePage();
+            } else {
+              return LoginPage();
+            }
+          }
+        },
+      ),
     );
   }
 }

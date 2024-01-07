@@ -19,6 +19,14 @@ class _MyOrderState extends State<MyOrder> {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   int selectedStars = 0;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Map<String, String> paymentStatusTextMap = {
+    'declined': 'Order is declined',
+    'pending': 'Waiting payment confirmation',
+    'confirmed': 'Order is processed',
+    'finished': 'Order is finished',
+    'reviewed': 'Thank you for your review'
+  };
+  int currentPageIndex = 1;
 
   @override
   void initState() {
@@ -76,14 +84,6 @@ class _MyOrderState extends State<MyOrder> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    Map<String, String> paymentStatusTextMap = {
-      'declined': 'Order is declined',
-      'pending': 'Waiting payment confirmation',
-      'confirmed': 'Order is processed',
-      'finished': 'Order is finished',
-      'reviewed': 'Thank you for your review'
-    };
-    int currentPageIndex = 1;
 
     return Scaffold(
       bottomNavigationBar: NavigationBar(

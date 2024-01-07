@@ -70,7 +70,8 @@ class _RegisterPageState extends State<RegisterPage> {
         'rekening': '',
         'rating': 0,
         'reviewCount': 0,
-        'storeSuspension': 'clear'
+        'storeSuspension': 'clear',
+        'userType': 'user'
       });
       showDialog(
         context: context,

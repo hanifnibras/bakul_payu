@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   bool myOrderNotification = false;
   bool sellerPageNotification = false;
   final uid = FirebaseAuth.instance.currentUser?.uid;
+  int currentPageIndex = 0;
 
   @override
   void initState() {
@@ -62,7 +63,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int currentPageIndex = 0;
     return WillPopScope(
         onWillPop: () async {
           // Show a confirmation dialog

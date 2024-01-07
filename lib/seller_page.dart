@@ -28,6 +28,7 @@ class _SellerPageState extends State<SellerPage> {
   String shopeeLink = "";
   bool myOrderNotification = false;
   bool sellerPageNotification = false;
+  int currentPageIndex = 2;
 
   @override
   void initState() {
@@ -146,7 +147,6 @@ class _SellerPageState extends State<SellerPage> {
 
   @override
   Widget build(BuildContext context) {
-    int currentPageIndex = 2;
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {

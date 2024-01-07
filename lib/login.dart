@@ -1,13 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:bakul_payu/admin_homepage.dart';
 import 'package:bakul_payu/forget_password.dart';
 import 'package:bakul_payu/homepage.dart';
-import 'package:bakul_payu/create_account.dart'; // Assuming your RegisterPage file is named register.dart
+import 'package:bakul_payu/create_account.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -21,14 +25,49 @@ class _LoginPageState extends State<LoginPage> {
   void _loginPressed() async {
     String username = _usernameController.text;
     String password = _passwordController.text;
-
     try {
-      await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: username,
         password: password,
       );
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const HomePage()));
+      String uid = userCredential.user!.uid;
+      DocumentSnapshot userSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if (userSnapshot.exists && userSnapshot.data() != null) {
+        String userType = userSnapshot.get('userType');
+        if (userType == 'user') {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            ),
+          );
+          return;
+        } else if (userType == 'admin') {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const AdminHomePage(),
+            ),
+          );
+          return;
+        }
+      }
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Login gagal. Mohon coba lagi.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     } catch (e) {
       showDialog(
         context: context,

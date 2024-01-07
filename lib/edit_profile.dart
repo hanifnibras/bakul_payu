@@ -23,6 +23,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController addressController = TextEditingController();
   bool myOrderNotification = false;
   bool sellerPageNotification = false;
+  int currentPageIndex = 3;
 
   Future<void> myOrderDotNotification() async {
     if (uid != null) {
@@ -62,7 +63,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    int currentPageIndex = 3;
     return Scaffold(
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {

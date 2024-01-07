@@ -70,13 +70,14 @@ class _CreateReportState extends State<CreateReport> {
         'reportImgUrl': imageURL,
         'reportMessage': _reportMessageController.text.trim(),
         'customerId': widget.customerId,
-        'sellerId': widget.sellerId
+        'sellerId': widget.sellerId,
+        'reportStatus': "active",
       });
       await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.sellerId)
           .update({
-        'storeSuspension': 'firstWarning',
+        'storeSuspension': 'pending',
       });
       popUpTerimaKasih();
       print('Firestore updated with image URL');
