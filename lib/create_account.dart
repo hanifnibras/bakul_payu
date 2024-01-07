@@ -69,7 +69,8 @@ class _RegisterPageState extends State<RegisterPage> {
         'shopeeLink': '',
         'rekening': '',
         'rating': 0,
-        'reviewCount': 0
+        'reviewCount': 0,
+        'storeSuspension': 'clear'
       });
       showDialog(
         context: context,

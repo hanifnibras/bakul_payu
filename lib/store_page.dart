@@ -1,6 +1,8 @@
 import 'package:bakul_payu/cart_item.dart';
+import 'package:bakul_payu/create_report.dart';
 import 'package:bakul_payu/product_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class StorePage extends StatefulWidget {
@@ -18,6 +20,7 @@ class StorePage extends StatefulWidget {
 }
 
 class _StorePageState extends State<StorePage> {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
   @override
   void initState() {
     super.initState();
@@ -199,7 +202,69 @@ class _StorePageState extends State<StorePage> {
                     return Text('Error: ${snapshot.error}');
                   }
                   return const CircularProgressIndicator();
-                })
+                }),
+            ElevatedButton(
+                onPressed: () {
+                  if (uid != null) {
+                    if (uid != widget.sellerId) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => CreateReport(
+                                customerId: uid,
+                                sellerId: widget.sellerId,
+                                sellerName: widget.sellerName)),
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Error'),
+                            content: const Text(
+                                'Seller cannot report their own store'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Error'),
+                          content:
+                              const Text('System error mohon login kembali'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.warning_rounded),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('Report Store'),
+                  ],
+                )),
           ],
         ),
       ),

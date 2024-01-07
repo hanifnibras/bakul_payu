@@ -238,6 +238,62 @@ class _SellerPageState extends State<SellerPage> {
             const SizedBox(
               height: 20,
             ),
+            StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                      sellerSnapshot) {
+                if (!sellerSnapshot.hasData || !sellerSnapshot.data!.exists) {
+                  return const Center(
+                    child: Text('Rating information not available'),
+                  );
+                }
+                final Map<String, dynamic> sellerData =
+                    sellerSnapshot.data!.data()!;
+                int rating = sellerData['rating'] ?? 0;
+                int reviewCount = sellerData['reviewCount'] ?? 0;
+                double storeRating = reviewCount > 0 ? rating / reviewCount : 0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Rating Toko Anda",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: List.generate(
+                            5,
+                            (index) => Icon(
+                              Icons.star,
+                              color: index < storeRating
+                                  ? Colors.yellow
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text('(${storeRating.toStringAsFixed(2)})'),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text('($reviewCount reviews)'),
+                      ],
+                    )
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 20),
             const Text(
               "Daftar Produk",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
