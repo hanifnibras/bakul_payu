@@ -4,6 +4,7 @@ import 'package:bakul_payu/admin_homepage.dart';
 import 'package:bakul_payu/forget_password.dart';
 import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/create_account.dart';
+import 'package:bakul_payu/suspended.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -35,12 +36,19 @@ class _LoginPageState extends State<LoginPage> {
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
       if (userSnapshot.exists && userSnapshot.data() != null) {
         String userType = userSnapshot.get('userType');
+        String suspensionStatus = userSnapshot.get('storeSuspension');
         if (userType == 'user') {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const HomePage(),
-            ),
-          );
+          if (suspensionStatus == 'suspended') {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const SuspendedPage(),
+            ));
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const HomePage(),
+              ),
+            );
+          }
           return;
         } else if (userType == 'admin') {
           Navigator.of(context).push(

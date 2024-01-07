@@ -1,4 +1,5 @@
 import 'package:bakul_payu/admin_homepage.dart';
+import 'package:bakul_payu/suspended.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,20 @@ class MyApp extends StatelessWidget {
     return "";
   }
 
+  Future<String> getSuspensionStatus() async {
+    if (user != null) {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .get();
+      if (userSnapshot.exists) {
+        String suspensionStatus = userSnapshot.get('storeSuspension');
+        return suspensionStatus;
+      }
+    }
+    return "";
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -46,15 +61,19 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: FutureBuilder(
-        future: getUserType(),
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+        future: Future.wait([getUserType(), getSuspensionStatus()]),
+        builder: (context, AsyncSnapshot<List<String>> snapshots) {
+          if (snapshots.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text("Error: ${snapshot.error}");
+          } else if (snapshots.hasError) {
+            return Text("Error: ${snapshots.error}");
           } else {
-            String userType = snapshot.data ?? "";
+            String userType = snapshots.data?[0] ?? "";
+            String suspensionStatus = snapshots.data?[1] ?? "";
             if (userType == 'user') {
+              if (suspensionStatus == 'suspended') {
+                return const SuspendedPage();
+              }
               return const HomePage();
             }
             if (userType == 'admin') {

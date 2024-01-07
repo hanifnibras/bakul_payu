@@ -30,6 +30,21 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     myOrderDotNotification();
     sellerPageDotNotification();
+    sellerSuspensionNotification();
+  }
+
+  Future<void> sellerSuspensionNotification() async {
+    late String suspensionStatus;
+    if (uid != null) {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      suspensionStatus = snapshot.data()?['storeSuspension'] ?? "";
+      if (suspensionStatus != 'clear') {
+        setState(() {
+          sellerPageNotification = true;
+        });
+      }
+    }
   }
 
   Future<void> myOrderDotNotification() async {

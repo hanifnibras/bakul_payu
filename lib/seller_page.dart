@@ -4,6 +4,7 @@ import 'package:bakul_payu/edit_profile.dart';
 import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/seller_crud_page.dart';
 import 'package:bakul_payu/seller_order.dart';
+import 'package:bakul_payu/store_suspended.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -33,9 +34,11 @@ class _SellerPageState extends State<SellerPage> {
   @override
   void initState() {
     super.initState();
+    secondWarning();
     _fetchSellerData();
     myOrderDotNotification();
     sellerPageDotNotification();
+    sellerSuspensionNotification();
   }
 
   Future<void> myOrderDotNotification() async {
@@ -67,6 +70,34 @@ class _SellerPageState extends State<SellerPage> {
     }
   }
 
+  Future<void> sellerSuspensionNotification() async {
+    late String suspensionStatus;
+    if (uid != null) {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      suspensionStatus = snapshot.data()?['storeSuspension'] ?? "";
+      if (suspensionStatus != 'clear') {
+        setState(() {
+          sellerPageNotification = true;
+        });
+      }
+    }
+  }
+
+  Future<void> secondWarning() async {
+    late String suspensionStatus;
+    if (uid != null) {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      suspensionStatus = snapshot.data()?['storeSuspension'] ?? "";
+      if (suspensionStatus == 'secondWarning') {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const StoreSuspendedPage()),
+        );
+      }
+    }
+  }
+
   Future<void> _fetchSellerData() async {
     if (uid != null) {
       final DocumentSnapshot<Map<String, dynamic>> snapshot =
@@ -86,12 +117,9 @@ class _SellerPageState extends State<SellerPage> {
   Future<String> uploadImageToStorage(File imageFile, String imageName) async {
     try {
       String filePath = 'images/seller/$imageName';
-
       Reference storageReference = FirebaseStorage.instance.ref(filePath);
-
       UploadTask uploadTask = storageReference.putFile(imageFile);
       await uploadTask.whenComplete(() => null);
-
       String downloadURL = await storageReference.getDownloadURL();
       return downloadURL;
     } catch (e) {
@@ -239,58 +267,118 @@ class _SellerPageState extends State<SellerPage> {
               height: 20,
             ),
             StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(uid)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                        snapshot) {
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return const Center(
+                      child: Text('Rating information not available'),
+                    );
+                  } else {
+                    final Map<String, dynamic> sellerData =
+                        snapshot.data!.data()!;
+                    String suspensionStatus =
+                        sellerData['storeSuspension'] ?? "";
+                    if (suspensionStatus == 'pending') {
+                      return const Column(
+                        children: [
+                          Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                "Peringatan\nKami telah menerima laporan dari customer mengenai toko anda. Mohon menunggu informasi berikutnya",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          )
+                        ],
+                      );
+                    } else if (suspensionStatus == 'firstWarning') {
+                      return const Column(
+                        children: [
+                          Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                "Peringatan\nIni adalah peringatan pertama. Mohon segera menghubungi admin kami melalui email: bakulpayuadmin@gmail.com sebelum toko anda kami suspend.",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          )
+                        ],
+                      );
+                    } else {
+                      return const SizedBox(
+                        height: 0,
+                      );
+                    }
+                  }
+                }),
+            StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection('users')
                   .doc(uid)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
-                      sellerSnapshot) {
-                if (!sellerSnapshot.hasData || !sellerSnapshot.data!.exists) {
+                      snapshot) {
+                if (!snapshot.hasData || !snapshot.data!.exists) {
                   return const Center(
                     child: Text('Rating information not available'),
                   );
-                }
-                final Map<String, dynamic> sellerData =
-                    sellerSnapshot.data!.data()!;
-                int rating = sellerData['rating'] ?? 0;
-                int reviewCount = sellerData['reviewCount'] ?? 0;
-                double storeRating = reviewCount > 0 ? rating / reviewCount : 0;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Rating Toko Anda",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: List.generate(
-                            5,
-                            (index) => Icon(
-                              Icons.star,
-                              color: index < storeRating
-                                  ? Colors.yellow
-                                  : Colors.grey,
+                } else {
+                  final Map<String, dynamic> sellerData =
+                      snapshot.data!.data()!;
+                  int rating = sellerData['rating'] ?? 0;
+                  int reviewCount = sellerData['reviewCount'] ?? 0;
+                  double storeRating =
+                      reviewCount > 0 ? rating / reviewCount : 0;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Rating Toko Anda",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: List.generate(
+                              5,
+                              (index) => Icon(
+                                Icons.star,
+                                color: index < storeRating
+                                    ? Colors.yellow
+                                    : Colors.grey,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text('(${storeRating.toStringAsFixed(2)})'),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text('($reviewCount reviews)'),
-                      ],
-                    )
-                  ],
-                );
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text('(${storeRating.toStringAsFixed(2)})'),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text('($reviewCount reviews)'),
+                        ],
+                      )
+                    ],
+                  );
+                }
               },
             ),
             const SizedBox(height: 20),

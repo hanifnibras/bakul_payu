@@ -116,8 +116,6 @@ class _AdminReportState extends State<AdminReport> {
                           String reportImgUrl = reportDetails['reportImgUrl'];
                           String reportMessage = reportDetails['reportMessage'];
                           String reportId = reports[index].id;
-
-                          // Use FutureBuilder to handle asynchronous data fetching
                           return FutureBuilder(
                             future: Future.wait([
                               _fetchSellerName(sellerId),
@@ -125,19 +123,18 @@ class _AdminReportState extends State<AdminReport> {
                               _fetchSellerSuspensionStatus(sellerId)
                             ]),
                             builder: (context,
-                                AsyncSnapshot<List<String>> namesSnapshot) {
-                              if (namesSnapshot.connectionState ==
+                                AsyncSnapshot<List<String>> snapshots) {
+                              if (snapshots.connectionState ==
                                   ConnectionState.waiting) {
                                 return CircularProgressIndicator();
                               }
-                              if (namesSnapshot.hasError) {
-                                return Text('Error: ${namesSnapshot.error}');
+                              if (snapshots.hasError) {
+                                return Text('Error: ${snapshots.error}');
                               }
-                              String sellerName = namesSnapshot.data?[0] ?? '';
-                              String customerName =
-                                  namesSnapshot.data?[1] ?? '';
+                              String sellerName = snapshots.data?[0] ?? '';
+                              String customerName = snapshots.data?[1] ?? '';
                               String suspensionStatus =
-                                  namesSnapshot.data?[2] ?? '';
+                                  snapshots.data?[2] ?? '';
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
