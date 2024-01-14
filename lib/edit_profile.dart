@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:bakul_payu/chat_list.dart';
 import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/my_order.dart';
 import 'package:bakul_payu/seller_page.dart';
@@ -23,7 +24,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   TextEditingController addressController = TextEditingController();
   bool myOrderNotification = false;
   bool sellerPageNotification = false;
-  int currentPageIndex = 3;
+  int currentPageIndex = 4;
 
   Future<void> myOrderDotNotification() async {
     if (uid != null) {
@@ -42,12 +43,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> sellerPageDotNotification() async {
     if (uid != null) {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
-          await FirebaseFirestore
-              .instance
+          await FirebaseFirestore.instance
               .collection('transactions')
               .where('sellerId', isEqualTo: uid)
-              .where('transactionStatus',
-                  whereIn: ["pending", "reviewed"]).get();
+              .where('transactionStatus', whereIn: ["pending"]).get();
       setState(() {
         sellerPageNotification = snapshot.docs.isNotEmpty;
       });
@@ -101,7 +100,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 );
                 break;
               case 3:
-                // Do nothing, already on the EditProfilePage
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const ChatListPage()),
+                );
+                break;
+              case 4:
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) => const EditProfilePage()),
+                );
                 break;
             }
           },
@@ -144,6 +151,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 label: 'Seller Page',
               )
             ],
+            const NavigationDestination(
+              selectedIcon: Icon(Icons.message),
+              icon: Icon(Icons.message_outlined),
+              label: 'Chats',
+            ),
             const NavigationDestination(
               selectedIcon: Icon(Icons.account_circle),
               icon: Icon(Icons.account_circle_outlined),

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:bakul_payu/chat_list.dart';
 import 'package:bakul_payu/my_order.dart';
 import 'package:bakul_payu/seller_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   String selectedCategory = "allCat";
   bool myOrderNotification = false;
   bool sellerPageNotification = false;
+  bool isUnRead = false;
   final uid = FirebaseAuth.instance.currentUser?.uid;
   int currentPageIndex = 0;
 
@@ -31,6 +33,7 @@ class _HomePageState extends State<HomePage> {
     myOrderDotNotification();
     sellerPageDotNotification();
     sellerSuspensionNotification();
+    fetchUnreadStatus();
   }
 
   Future<void> sellerSuspensionNotification() async {
@@ -44,6 +47,45 @@ class _HomePageState extends State<HomePage> {
           sellerPageNotification = true;
         });
       }
+    }
+  }
+
+  Future<void> fetchUnreadStatus() async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('messages')
+          .where('participants', arrayContains: uid)
+          .get();
+
+      for (QueryDocumentSnapshot conversation in querySnapshot.docs) {
+        final chatId = conversation.id;
+        final latestMessageSnapshot = await FirebaseFirestore.instance
+            .collection('messages')
+            .doc(chatId)
+            .collection('messageList')
+            .where('receiverId', isEqualTo: uid)
+            .orderBy('timestamp', descending: true)
+            .limit(1)
+            .get();
+
+        if (latestMessageSnapshot.docs.isNotEmpty) {
+          final latestMessage = latestMessageSnapshot.docs.first.data();
+          if (latestMessage['unread'] == true) {
+            print("DETECTED");
+            setState(() {
+              isUnRead = true;
+            });
+            return; // Stop checking if an unread message is found
+          }
+        }
+      }
+
+      // No unread messages found
+      setState(() {
+        isUnRead = false;
+      });
+    } catch (e) {
+      print("Error fetching unread status: $e");
     }
   }
 
@@ -64,12 +106,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> sellerPageDotNotification() async {
     if (uid != null) {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
-          await FirebaseFirestore
-              .instance
+          await FirebaseFirestore.instance
               .collection('transactions')
               .where('sellerId', isEqualTo: uid)
-              .where('transactionStatus',
-                  whereIn: ["pending", "reviewed"]).get();
+              .where('transactionStatus', whereIn: ["pending"]).get();
       setState(() {
         sellerPageNotification = snapshot.docs.isNotEmpty;
       });
@@ -128,6 +168,12 @@ class _HomePageState extends State<HomePage> {
                   case 3:
                     Navigator.of(context).push(
                       MaterialPageRoute(
+                          builder: (context) => const ChatListPage()),
+                    );
+                    break;
+                  case 4:
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
                           builder: (context) => const EditProfilePage()),
                     );
                     break;
@@ -170,6 +216,22 @@ class _HomePageState extends State<HomePage> {
                     selectedIcon: Icon(Icons.business),
                     icon: Icon(Icons.business_outlined),
                     label: 'Seller Page',
+                  )
+                ],
+                if (isUnRead == true) ...[
+                  const NavigationDestination(
+                    selectedIcon: Icon(Icons.message),
+                    icon: Badge(
+                      label: Text('!'),
+                      child: Icon(Icons.message_outlined),
+                    ),
+                    label: 'Chats',
+                  )
+                ] else ...[
+                  const NavigationDestination(
+                    selectedIcon: Icon(Icons.message),
+                    icon: Icon(Icons.message_outlined),
+                    label: 'Chats',
                   )
                 ],
                 const NavigationDestination(

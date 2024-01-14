@@ -1,4 +1,5 @@
 import 'package:bakul_payu/cart_item.dart';
+import 'package:bakul_payu/chat_room.dart';
 import 'package:bakul_payu/create_report.dart';
 import 'package:bakul_payu/product_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,6 +35,8 @@ class _StorePageState extends State<StorePage> {
         title: const Text("Bakul Payu"),
       ),
       body: SingleChildScrollView(
+          child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -91,6 +94,35 @@ class _StorePageState extends State<StorePage> {
                   ],
                 ));
               },
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChatRoom(
+                      receiverId: widget.sellerId,
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.message),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text('Chat With ${widget.sellerName}\'s Store')
+                ],
+              ),
             ),
             StreamBuilder(
                 stream: FirebaseFirestore.instance
@@ -267,7 +299,7 @@ class _StorePageState extends State<StorePage> {
                 )),
           ],
         ),
-      ),
+      )),
     );
   }
 }

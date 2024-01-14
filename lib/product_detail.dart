@@ -1,3 +1,4 @@
+import 'package:bakul_payu/chat_room.dart';
 import 'package:bakul_payu/store_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -160,10 +161,39 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ],
               ),
               const SizedBox(
-                height: 30,
+                height: 10,
+              ),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ChatRoom(
+                            receiverId: widget.sellerId,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.message),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text('Chat With $sellerName\'s Store')
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(
-                height: 10,
+                height: 30,
               ),
               Center(
                 child: ElevatedButton(

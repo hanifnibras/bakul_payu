@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:bakul_payu/chat_list.dart';
 import 'package:bakul_payu/edit_profile.dart';
 import 'package:bakul_payu/homepage.dart';
 import 'package:bakul_payu/seller_crud_page.dart';
@@ -199,6 +200,11 @@ class _SellerPageState extends State<SellerPage> {
               break;
             case 3:
               Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ChatListPage()),
+              );
+              break;
+            case 4:
+              Navigator.of(context).push(
                 MaterialPageRoute(
                     builder: (context) => const EditProfilePage()),
               );
@@ -244,6 +250,11 @@ class _SellerPageState extends State<SellerPage> {
               label: 'Seller Page',
             )
           ],
+          const NavigationDestination(
+            selectedIcon: Icon(Icons.message),
+            icon: Icon(Icons.message_outlined),
+            label: 'Chats',
+          ),
           const NavigationDestination(
             selectedIcon: Icon(Icons.account_circle),
             icon: Icon(Icons.account_circle_outlined),
